@@ -65,7 +65,7 @@ func DownloadFile(filepath string, url string) error {
 		return errors.New("Bad status: " + resp.Status)
 	}
 
-	pw := progresswritter.New(uint64(resp.ContentLength))
+	pw := progresswritter.NewNonBloking(uint64(resp.ContentLength))
 
 	// Write the body to file
 	_, err = io.Copy(out, io.TeeReader(resp.Body, pw))
