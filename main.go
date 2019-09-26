@@ -21,6 +21,7 @@ func main() {
 
 	goVersion := runtime.Version()
 	fmt.Printf("Current go version %s\n", goVersion)
+	fmt.Printf("Downloading: %s\n", filePath)
 
 	err = DownloadFile(filePath, fileURL)
 	if err != nil {
@@ -116,9 +117,9 @@ func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
 
 // DownloadData will return the data needed to download and save the file
 func DownloadData() (filePath, fileURL, fileSHA256 string, err error) {
-	filePath = "go1.12.9.windows-amd64.msi"
-	fileURL = "https://dl.google.com/go/go1.12.9.windows-amd64.msi"
-	fileSHA256 = "da2fc362c7afcab611709ef56e1bb145c92dfaf361cafdd75634ac8172ded245"
+	filePath = "go1.13.1.windows-amd64.msi"
+	fileURL = "https://dl.google.com/go/go1.13.1.windows-amd64.msi"
+	fileSHA256 = "ee6ff4f31766096e6ff00bdd855e007c473cc9080f3588d7be0c5ec0e0b85578"
 	err = nil
 
 	return

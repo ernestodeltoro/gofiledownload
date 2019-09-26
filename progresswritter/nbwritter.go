@@ -31,12 +31,14 @@ func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 }
 
 func (pw *NonBlokingProgressWriter) serveUpdateChannel() {
+	defer close(pw.newWrite)
 	for range pw.newWrite {
 		pw.updateProgress()
 	}
 }
 
-func (pw *NonBlokingProgressWriter) execNewWrite() {
+// Non Blocking write on a channel
+func (pw *NonBlokingProgressWriter) execNewWriteNonBlocking() {
 	select {
 	case pw.newWrite <- true:
 		return
@@ -47,7 +49,7 @@ func (pw *NonBlokingProgressWriter) execNewWrite() {
 func (pw *NonBlokingProgressWriter) Write(p []byte) (int, error) {
 	n := len(p)
 	pw.currentWritten += uint64(n)
-	pw.execNewWrite()
+	pw.execNewWriteNonBlocking()
 	return n, nil
 }
 
