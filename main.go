@@ -117,9 +117,9 @@ func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
 
 // DownloadData will return the data needed to download and save the file
 func DownloadData() (filePath, fileURL, fileSHA256 string, err error) {
-	filePath = "go1.13.1.windows-amd64.msi"
-	fileURL = "https://dl.google.com/go/go1.13.1.windows-amd64.msi"
-	fileSHA256 = "ee6ff4f31766096e6ff00bdd855e007c473cc9080f3588d7be0c5ec0e0b85578"
+	filePath = "go1.13.3.windows-amd64.msi"
+	fileURL = "https://dl.google.com/go/go1.13.3.windows-amd64.msi"
+	fileSHA256 = "d6d1a3287c994574f88a8650a1e7f4fff19babc04979c9a8cf0178ef9a49ed10"
 	err = nil
 
 	return
