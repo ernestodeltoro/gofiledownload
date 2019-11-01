@@ -130,6 +130,7 @@ func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
 func DownloadData(fileIndex int) (filePath, fileURL, fileSHA256 string, err error) {
 
 	seedURL := "https://golang.org/dl/"
+	const numberOfHighlightedItemsToRetrieve = 4
 
 	// Get the data
 	resp, err := http.Get(seedURL)
@@ -138,8 +139,13 @@ func DownloadData(fileIndex int) (filePath, fileURL, fileSHA256 string, err erro
 	}
 	defer resp.Body.Close()
 
-	links, err := webscraper.GetHighlightClassTokensN(resp, 4)
+	links, err := webscraper.GetHighlightClassTokensN(resp, numberOfHighlightedItemsToRetrieve)
 	if err != nil {
+		return
+	}
+
+	if len(links) != numberOfHighlightedItemsToRetrieve {
+		err = errors.New("unable to retrieve all the items from the download page")
 		return
 	}
 

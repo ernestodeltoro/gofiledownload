@@ -29,8 +29,8 @@ func (dl DownloadLink) Sha256() string {
 	return dl.sha256
 }
 
-// GetHighlightClassTokensN will return the up to the first N of all the highligth class tokens in the
-// http.Response along with the sha value that is on the table
+// GetHighlightClassTokensN will return up to the first N of all the highligth class tokens in the
+// http.Response along with the SHA value that is on the table
 func GetHighlightClassTokensN(resp *http.Response, n int) ([]DownloadLink, error) {
 
 	links := make([]DownloadLink, 0, n)
