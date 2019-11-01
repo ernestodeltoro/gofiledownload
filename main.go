@@ -10,18 +10,29 @@ import (
 	"runtime"
 
 	"github.com/ernestodeltoro/goFileDownload/progresswritter"
+	"github.com/ernestodeltoro/goFileDownload/webscraper"
+)
+
+const (
+	sourceFile int = iota
+	appleFile
+	linuxFile
+	windowsFile
 )
 
 func main() {
 
-	filePath, fileURL, fileSHA256, err := DownloadData()
+	goVersion := runtime.Version()
+	fmt.Printf("Current go version %s\n", goVersion)
+
+	osARCH := getOSFileIndex()
+
+	filePath, fileURL, fileSHA256, err := DownloadData(osARCH)
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
 
-	goVersion := runtime.Version()
-	fmt.Printf("Current go version %s\n", goVersion)
-	fmt.Printf("Downloading: %s\n", filePath)
+	fmt.Printf("to download:\n%s\n", fileURL)
 
 	err = DownloadFile(filePath, fileURL)
 	if err != nil {
@@ -36,7 +47,7 @@ func main() {
 	if !shaOK {
 		fmt.Println("SHA256 values don't match")
 	} else {
-		fmt.Println("SHA256 value verified")
+		fmt.Println("SHA256 value verified, ok")
 	}
 
 }
@@ -116,11 +127,39 @@ func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
 }
 
 // DownloadData will return the data needed to download and save the file
-func DownloadData() (filePath, fileURL, fileSHA256 string, err error) {
-	filePath = "go1.13.3.windows-amd64.msi"
-	fileURL = "https://dl.google.com/go/go1.13.3.windows-amd64.msi"
-	fileSHA256 = "d6d1a3287c994574f88a8650a1e7f4fff19babc04979c9a8cf0178ef9a49ed10"
+func DownloadData(fileIndex int) (filePath, fileURL, fileSHA256 string, err error) {
+
+	seedURL := "https://golang.org/dl/"
+
+	// Get the data
+	resp, err := http.Get(seedURL)
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	}
+	defer resp.Body.Close()
+
+	links, err := webscraper.GetHighlightClassTokensN(resp, 4)
+	if err != nil {
+		return
+	}
+
+	filePath = links[fileIndex].FileName()
+	fileURL = links[fileIndex].Href()
+	fileSHA256 = links[fileIndex].Sha256()
 	err = nil
 
 	return
+}
+
+func getOSFileIndex() int {
+	switch runtime.GOOS {
+	case "windows":
+		return windowsFile
+	case "linux":
+		return linuxFile
+	case "darwin":
+		return appleFile
+	default:
+		return sourceFile
+	}
 }
