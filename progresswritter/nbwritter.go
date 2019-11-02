@@ -12,8 +12,9 @@ import (
 // write cycle.
 type NonBlokingProgressWriter struct {
 	currentWritten uint64
-	fullSize       string
+	fullSize       uint64
 	newWrite       chan bool
+	done           bool
 }
 
 // NewNonBloking returns a Writer interface that allows to show the
@@ -21,8 +22,9 @@ type NonBlokingProgressWriter struct {
 func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 	pw := NonBlokingProgressWriter{
 		currentWritten: 0,
-		fullSize:       humanize.Bytes(fullSize),
+		fullSize:       fullSize,
 		newWrite:       make(chan bool),
+		done:           false,
 	}
 
 	go pw.serveUpdateChannel()
@@ -56,10 +58,15 @@ func (pw *NonBlokingProgressWriter) Write(p []byte) (int, error) {
 // updateProgress prints
 func (pw *NonBlokingProgressWriter) updateProgress() {
 
-	fmt.Printf("\r%s", strings.Repeat(" ", 40))
+	if !pw.done {
+		fmt.Printf("\r%s", strings.Repeat(" ", 40))
 
-	// Return again and print current status of download
-	// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
-	fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), pw.fullSize)
+		// Return again and print current status of download
+		// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
+		fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), humanize.Bytes(pw.fullSize))
+	}
+	if pw.fullSize == pw.currentWritten {
+		pw.done = true
+	}
 
 }
