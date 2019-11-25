@@ -36,6 +36,9 @@ func (pw *NonBlokingProgressWriter) serveUpdateChannel() {
 	defer close(pw.newWrite)
 	for range pw.newWrite {
 		pw.updateProgress()
+		if pw.fullSize == pw.currentWritten {
+			pw.done = true
+		}
 	}
 }
 
@@ -65,8 +68,4 @@ func (pw *NonBlokingProgressWriter) updateProgress() {
 		// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
 		fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), humanize.Bytes(pw.fullSize))
 	}
-	if pw.fullSize == pw.currentWritten {
-		pw.done = true
-	}
-
 }

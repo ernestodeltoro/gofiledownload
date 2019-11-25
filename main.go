@@ -20,26 +20,34 @@ const (
 	windowsFile
 )
 
+// FileData data struct to contain the info for downloading
+type FileData struct {
+	FilePath   string
+	FileURL    string
+	FileSHA256 string
+}
+
+type OsArch int
+
 func main() {
 
 	goVersion := runtime.Version()
 	fmt.Printf("Current go version %s\n", goVersion)
 
-	osARCH := getOSFileIndex()
+	fd, err := InitializeFileData()
+	if err != nil {
+		fmt.Printf("failed to create event: %s\n", err.Error())
+		os.Exit(2)
+	}
 
-	filePath, fileURL, fileSHA256, err := DownloadData(osARCH)
+	fmt.Printf("To download:\n%s\n", fd.FileURL)
+
+	err = DownloadFile(fd)
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
 
-	fmt.Printf("to download:\n%s\n", fileURL)
-
-	err = DownloadFile(filePath, fileURL)
-	if err != nil {
-		fmt.Printf(err.Error())
-	}
-
-	shaOK, err := VerifyFileSHA256(filePath, fileSHA256)
+	shaOK, err := VerifyFileSHA256(fd)
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
@@ -55,18 +63,18 @@ func main() {
 // DownloadFile will download a url to a local file. It's efficient because it will
 // write as it downloads and not load the whole file into memory.
 // extracted from: https://golangcode.com/download-a-file-with-progress/
-func DownloadFile(filepath string, url string) error {
+func DownloadFile(fd FileData) error {
 
 	// Create the file, but give it a tmp file extension, this means we won't overwrite a
 	// file until it's downloaded, but we'll remove the tmp extension once downloaded.
-	out, err := os.Create(filepath + ".tmp")
+	out, err := os.Create(fd.FilePath + ".tmp")
 	if err != nil {
 		return err
 	}
 	defer out.Close()
 
 	// Get the data
-	resp, err := http.Get(url)
+	resp, err := http.Get(fd.FileURL)
 	if err != nil {
 		return err
 	}
@@ -94,7 +102,7 @@ func DownloadFile(filepath string, url string) error {
 		return err
 	}
 
-	err = os.Rename(filepath+".tmp", filepath)
+	err = os.Rename(fd.FilePath+".tmp", fd.FilePath)
 	if err != nil {
 		return err
 	}
@@ -104,8 +112,8 @@ func DownloadFile(filepath string, url string) error {
 
 // VerifyFileSHA256 Compares the expected SHA256 with the actual value
 // extracted from the file and returns true if they match
-func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
-	f, err := os.Open(filePath)
+func VerifyFileSHA256(fd FileData) (bool, error) {
+	f, err := os.Open(fd.FilePath)
 	if err != nil {
 		return false, err
 	}
@@ -119,7 +127,7 @@ func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
 
 	strSHA := fmt.Sprintf("%x", h.Sum(nil))
 
-	if strSHA != expectedFileSHA256 {
+	if strSHA != fd.FileSHA256 {
 		return false, nil
 	}
 
@@ -127,7 +135,7 @@ func VerifyFileSHA256(filePath, expectedFileSHA256 string) (bool, error) {
 }
 
 // DownloadData will return the data needed to download and save the file
-func DownloadData(fileIndex int) (filePath, fileURL, fileSHA256 string, err error) {
+func DownloadData(osARCH OsArch) (fd FileData, err error) {
 
 	seedURL := "https://golang.org/dl/"
 	const numberOfHighlightedItemsToRetrieve = 4
@@ -149,23 +157,27 @@ func DownloadData(fileIndex int) (filePath, fileURL, fileSHA256 string, err erro
 		return
 	}
 
-	filePath = links[fileIndex].FileName()
-	fileURL = links[fileIndex].Href()
-	fileSHA256 = links[fileIndex].Sha256()
+	fd.FilePath = links[osARCH].FileName()
+	fd.FileURL = links[osARCH].Href()
+	fd.FileSHA256 = links[osARCH].Sha256()
 	err = nil
 
 	return
 }
 
-func getOSFileIndex() int {
+// GetOSFileIndex returns the detected OS type
+func GetOSFileIndex() OsArch {
+	var osARCH int
 	switch runtime.GOOS {
 	case "windows":
-		return windowsFile
+		osARCH = windowsFile
 	case "linux":
-		return linuxFile
+		osARCH = linuxFile
 	case "darwin":
-		return appleFile
+		osARCH = appleFile
 	default:
-		return sourceFile
+		osARCH = sourceFile
 	}
+
+	return OsArch(osARCH)
 }
