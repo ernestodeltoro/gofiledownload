@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/ernestodeltoro/goFileDownload/progresswritter"
 	"github.com/ernestodeltoro/goFileDownload/webscraper"
@@ -27,6 +28,7 @@ type FileData struct {
 	FileSHA256 string
 }
 
+// OsArch to return the type of platform the download program is runing
 type OsArch int
 
 func main() {
@@ -42,10 +44,16 @@ func main() {
 
 	fmt.Printf("To download:\n%s\n", fd.FileURL)
 
+	start := time.Now()
+
 	err = DownloadFile(fd)
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
+
+	elapsed := time.Since(start)
+
+	fmt.Printf("Done in %s...\n", elapsed)
 
 	shaOK, err := VerifyFileSHA256(fd)
 	if err != nil {

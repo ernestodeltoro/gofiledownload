@@ -13,7 +13,7 @@ import (
 type NonBlokingProgressWriter struct {
 	currentWritten uint64
 	fullSize       uint64
-	newWrite       chan bool
+	newWrite       chan uint64
 	done           bool
 }
 
@@ -23,7 +23,7 @@ func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 	pw := NonBlokingProgressWriter{
 		currentWritten: 0,
 		fullSize:       fullSize,
-		newWrite:       make(chan bool),
+		newWrite:       make(chan uint64),
 		done:           false,
 	}
 
@@ -33,19 +33,21 @@ func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 }
 
 func (pw *NonBlokingProgressWriter) serveUpdateChannel() {
-	defer close(pw.newWrite)
-	for range pw.newWrite {
+	defer func() {
+		close(pw.newWrite)
+		pw.currentWritten = pw.fullSize
 		pw.updateProgress()
-		if pw.fullSize == pw.currentWritten {
-			pw.done = true
-		}
+	}()
+	for written := range pw.newWrite {
+		pw.currentWritten += written
+		pw.updateProgress()
 	}
 }
 
 // Non Blocking write on a channel
-func (pw *NonBlokingProgressWriter) execNewWriteNonBlocking() {
+func (pw *NonBlokingProgressWriter) execNewWriteNonBlocking(written uint64) {
 	select {
-	case pw.newWrite <- true:
+	case pw.newWrite <- written:
 		return
 	default:
 	}
@@ -53,8 +55,7 @@ func (pw *NonBlokingProgressWriter) execNewWriteNonBlocking() {
 
 func (pw *NonBlokingProgressWriter) Write(p []byte) (int, error) {
 	n := len(p)
-	pw.currentWritten += uint64(n)
-	pw.execNewWriteNonBlocking()
+	pw.execNewWriteNonBlocking(uint64(n))
 	return n, nil
 }
 
@@ -67,5 +68,8 @@ func (pw *NonBlokingProgressWriter) updateProgress() {
 		// Return again and print current status of download
 		// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
 		fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), humanize.Bytes(pw.fullSize))
+	}
+	if pw.fullSize == pw.currentWritten {
+		pw.done = true
 	}
 }
