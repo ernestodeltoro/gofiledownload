@@ -13,8 +13,7 @@ import (
 type NonBlokingProgressWriter struct {
 	currentWritten uint64
 	fullSize       uint64
-	newWrite       chan uint64
-	done           bool
+	newWrite       chan bool
 }
 
 // NewNonBloking returns a Writer interface that allows to show the
@@ -23,8 +22,7 @@ func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 	pw := NonBlokingProgressWriter{
 		currentWritten: 0,
 		fullSize:       fullSize,
-		newWrite:       make(chan uint64),
-		done:           false,
+		newWrite:       make(chan bool),
 	}
 
 	go pw.serveUpdateChannel()
@@ -34,20 +32,21 @@ func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 
 func (pw *NonBlokingProgressWriter) serveUpdateChannel() {
 	defer func() {
+		pw.updateProgress()
 		close(pw.newWrite)
-		pw.currentWritten = pw.fullSize
-		pw.updateProgress()
 	}()
-	for written := range pw.newWrite {
-		pw.currentWritten += written
+	for range pw.newWrite {
 		pw.updateProgress()
+		if pw.fullSize == pw.currentWritten {
+			break
+		}
 	}
 }
 
 // Non Blocking write on a channel
-func (pw *NonBlokingProgressWriter) execNewWriteNonBlocking(written uint64) {
+func (pw *NonBlokingProgressWriter) execUpdateNonBlocking() {
 	select {
-	case pw.newWrite <- written:
+	case pw.newWrite <- true:
 		return
 	default:
 	}
@@ -55,21 +54,18 @@ func (pw *NonBlokingProgressWriter) execNewWriteNonBlocking(written uint64) {
 
 func (pw *NonBlokingProgressWriter) Write(p []byte) (int, error) {
 	n := len(p)
-	pw.execNewWriteNonBlocking(uint64(n))
+	pw.currentWritten += uint64(n)
+	pw.execUpdateNonBlocking()
 	return n, nil
 }
 
 // updateProgress prints
 func (pw *NonBlokingProgressWriter) updateProgress() {
 
-	if !pw.done {
-		fmt.Printf("\r%s", strings.Repeat(" ", 40))
+	fmt.Printf("\r%s", strings.Repeat(" ", 40))
 
-		// Return again and print current status of download
-		// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
-		fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), humanize.Bytes(pw.fullSize))
-	}
-	if pw.fullSize == pw.currentWritten {
-		pw.done = true
-	}
+	// Return again and print current status of download
+	// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
+	fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), humanize.Bytes(pw.fullSize))
+
 }
