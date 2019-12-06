@@ -31,16 +31,17 @@ func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 }
 
 func (pw *NonBlokingProgressWriter) serveUpdateChannel() {
-	defer func() {
-		pw.updateProgress()
-		close(pw.newWrite)
-	}()
+
+	defer close(pw.newWrite)
+
 	for range pw.newWrite {
-		pw.updateProgress()
 		if pw.fullSize == pw.currentWritten {
 			break
+		} else {
+			pw.updateProgress()
 		}
 	}
+	pw.updateProgress()
 }
 
 // Non Blocking write on a channel
