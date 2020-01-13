@@ -35,14 +35,14 @@ func (pw *NonBlokingProgressWriter) serveUpdateChannel() {
 	defer close(pw.newWrite)
 
 	for range pw.newWrite {
-		if pw.fullSize == pw.currentWritten {
-			break
-		} else {
-			pw.updateProgress()
-		}
+		pw.updateProgress()
 	}
-	pw.updateProgress()
 }
+
+// DoneCh returns the done channel
+/*func (pw *NonBlokingProgressWriter) DoneCh() chan bool {
+	return pw.done
+}*/
 
 // Non Blocking write on a channel
 func (pw *NonBlokingProgressWriter) execUpdateNonBlocking() {
