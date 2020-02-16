@@ -3,6 +3,8 @@ package progresswritter
 import (
 	"fmt"
 	"strings"
+	"sync/atomic"
+	"time"
 
 	"github.com/dustin/go-humanize"
 )
@@ -13,16 +15,18 @@ import (
 type ConcurrentProgressWriter struct {
 	currentWritten uint64
 	fullSize       uint64
-	newWrite       chan bool
+	fullSizeStr    string
+	sleepTime      time.Duration
 }
 
 // NewConcurrent returns a Writer interface that allows to show the
 // writting progress in percentage given the fullSize of the file is known
-func NewConcurrent(fullSize uint64) *ConcurrentProgressWriter {
+func NewConcurrent(fullSize uint64, sleepTime time.Duration) *ConcurrentProgressWriter {
 	pw := ConcurrentProgressWriter{
 		currentWritten: 0,
 		fullSize:       fullSize,
-		newWrite:       make(chan bool),
+		fullSizeStr:    humanize.Bytes(fullSize),
+		sleepTime:      sleepTime,
 	}
 
 	go pw.serveUpdateChannel()
@@ -33,14 +37,22 @@ func NewConcurrent(fullSize uint64) *ConcurrentProgressWriter {
 func (pw *ConcurrentProgressWriter) Write(p []byte) (int, error) {
 	n := len(p)
 	pw.currentWritten += uint64(n)
-	pw.newWrite <- true
+	if atomic.CompareAndSwapUint64(&pw.currentWritten, pw.fullSize, pw.fullSize) {
+		// print for the last time
+		pw.updateProgress()
+	}
 	return n, nil
 }
 
 func (pw *ConcurrentProgressWriter) serveUpdateChannel() {
-	for range pw.newWrite {
+	for {
+		time.Sleep(pw.sleepTime * time.Millisecond)
+		if atomic.CompareAndSwapUint64(&pw.currentWritten, pw.fullSize, pw.fullSize) {
+			return
+		}
 		pw.updateProgress()
 	}
+
 }
 
 // updateProgress prints
@@ -52,5 +64,5 @@ func (pw *ConcurrentProgressWriter) updateProgress() {
 
 	// Return again and print current status of download
 	// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
-	fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), humanize.Bytes(pw.fullSize))
+	fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), pw.fullSizeStr)
 }
