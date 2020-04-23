@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"time"
 
@@ -33,8 +34,8 @@ type OsArch int
 
 func main() {
 
-	goVersion := runtime.Version()
-	fmt.Printf("Current go version %s\n", goVersion)
+	goVersion := GetInstalledGoVersion()
+	fmt.Printf("Current go version: %s\n", goVersion)
 
 	fd, err := InitializeFileData()
 	if err != nil {
@@ -188,4 +189,14 @@ func GetOSFileIndex() OsArch {
 	}
 
 	return OsArch(osARCH)
+}
+
+// GetInstalledGoVersion returns the curently installed go version on $GOROOT
+func GetInstalledGoVersion() string {
+	out, err := exec.Command("go", "version").Output()
+	if err != nil {
+		return "Undefined / unable to determine"
+	}
+	version := string(out)
+	return version
 }
