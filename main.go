@@ -197,6 +197,5 @@ func GetInstalledGoVersion() string {
 	if err != nil {
 		return "Undefined / unable to determine"
 	}
-	version := string(out)
-	return version
+	return string(out)
 }
