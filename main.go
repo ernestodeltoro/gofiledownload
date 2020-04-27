@@ -191,7 +191,7 @@ func GetOSFileIndex() OsArch {
 	return OsArch(osARCH)
 }
 
-// GetInstalledGoVersion returns the curently installed go version on $GOROOT
+// GetInstalledGoVersion returns the curently installed go version
 func GetInstalledGoVersion() string {
 	out, err := exec.Command("go", "version").Output()
 	if err != nil {
