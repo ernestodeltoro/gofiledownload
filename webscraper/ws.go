@@ -52,7 +52,7 @@ func GetHighlightClassTokensN(resp *http.Response, n int) ([]DownloadLink, error
 				if anchorToken == nil {
 					return links, nil
 				}
-				href, ok := getHTTPHref(anchorToken)
+				href, ok := getHref(anchorToken)
 				if !ok {
 					continue
 				}
@@ -71,18 +71,15 @@ func GetHighlightClassTokensN(resp *http.Response, n int) ([]DownloadLink, error
 	}
 }
 
-// getHTTPHref will return the token's href value if starts with "http" otherwise ok will be false
-func getHTTPHref(token *html.Token) (string, bool) {
-	href, ok := getHref(token)
-	if !ok {
-		return "", false
-	}
-	// Make sure the url begins in http**
+// HasHTTP Make sure the url begins in http**
+func HasHTTP(href string) bool {
 	hasProto := strings.Index(href, "http") == 0
-	if hasProto {
-		return href, true
-	}
-	return "", false
+	return hasProto
+}
+
+// AddProto will add the corresponding start of the url
+func AddProto(href string, proto string) string {
+	return proto + href
 }
 
 // getNextTT will iterate on the tokenizer until it finds a token type <tt> or the end of the document is reached

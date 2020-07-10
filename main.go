@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/ernestodeltoro/goFileDownload/progresswritter"
-	"github.com/ernestodeltoro/goFileDownload/webscraper"
+	ws "github.com/ernestodeltoro/goFileDownload/webscraper"
 )
 
 const (
@@ -146,7 +146,8 @@ func VerifyFileSHA256(fd FileData) (bool, error) {
 // DownloadData will return the data needed to download and save the file
 func DownloadData(osARCH OsArch) (fd FileData, err error) {
 
-	seedURL := "https://golang.org/dl/"
+	homePage := "https://golang.org"
+	seedURL := homePage + "/dl/"
 	const numberOfHighlightedItemsToRetrieve = 4
 
 	// Get the data
@@ -156,7 +157,7 @@ func DownloadData(osARCH OsArch) (fd FileData, err error) {
 	}
 	defer resp.Body.Close()
 
-	links, err := webscraper.GetHighlightClassTokensN(resp, numberOfHighlightedItemsToRetrieve)
+	links, err := ws.GetHighlightClassTokensN(resp, numberOfHighlightedItemsToRetrieve)
 	if err != nil {
 		return
 	}
@@ -167,11 +168,23 @@ func DownloadData(osARCH OsArch) (fd FileData, err error) {
 	}
 
 	fd.FilePath = links[osARCH].FileName()
-	fd.FileURL = links[osARCH].Href()
+	fd.FileURL = makeProperHREF(links[osARCH].Href(), homePage)
 	fd.FileSHA256 = links[osARCH].Sha256()
 	err = nil
 
 	return
+}
+
+// makeProperHREF construct the proper HREF based on the home web page
+func makeProperHREF(href string, proto string) string {
+	// Make sure the url begins in http**
+	hasProto := ws.HasHTTP(href)
+	if hasProto {
+		return href
+	}
+
+	newHref := ws.AddProto(href, "https://golang.org")
+	return newHref
 }
 
 // GetOSFileIndex returns the detected OS type
