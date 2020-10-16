@@ -29,7 +29,7 @@ type FileData struct {
 	FileSHA256 string
 }
 
-// OsArch to return the type of platform the download program is runing
+// OsArch to return the type of platform the download program is running
 type OsArch int
 
 func main() {

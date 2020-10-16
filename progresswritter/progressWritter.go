@@ -16,7 +16,7 @@ type ProgressWriter struct {
 }
 
 // New returns a Writer interface that allows to show the
-// writting progress in percentage given the fullSize of the file is known
+// writing progress in percentage given the fullSize of the file is known
 func New(fullSize uint64) *ProgressWriter {
 	pw := ProgressWriter{0, fullSize}
 	return &pw

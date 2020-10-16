@@ -20,7 +20,7 @@ type ConcurrentProgressWriter struct {
 }
 
 // NewConcurrent returns a Writer interface that allows to show the
-// writting progress in percentage given the fullSize of the file is known
+// writing progress in percentage given the fullSize of the file is known
 func NewConcurrent(fullSize uint64, sleepTime time.Duration) *ConcurrentProgressWriter {
 	pw := ConcurrentProgressWriter{
 		currentWritten: 0,

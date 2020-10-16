@@ -17,7 +17,7 @@ type NonBlokingProgressWriter struct {
 }
 
 // NewNonBloking returns a Writer interface that allows to show the
-// writting progress in percentage given the fullSize of the file is known
+// writing progress in percentage given the fullSize of the file is known
 func NewNonBloking(fullSize uint64) *NonBlokingProgressWriter {
 	pw := NonBlokingProgressWriter{
 		currentWritten: 0,
