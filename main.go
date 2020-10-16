@@ -71,7 +71,6 @@ func main() {
 
 // DownloadFile will download a url to a local file. It's efficient because it will
 // write as it downloads and not load the whole file into memory.
-// extracted from: https://golangcode.com/download-a-file-with-progress/
 func DownloadFile(fd FileData) error {
 
 	// Create the file, but give it a tmp file extension, this means we won't overwrite a

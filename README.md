@@ -4,7 +4,7 @@ Just code for downloading Go compiler files with Golang
 [![Go Report Card](https://goreportcard.com/badge/github.com/ernestodeltoro/gofiledownload)](https://goreportcard.com/badge/github.com/ernestodeltoro/gofiledownload)[![Travis](https://travis-ci.com/ernestodeltoro/gofiledownload.svg?branch=master)](https://travis-ci.com/ernestodeltoro/gofiledownload)
 
 
-Very simple program that search for the "install" file on [go downloads](https://golang.org/dl/) based on your O.S. Makes the download, and verifies it's checksum.
+Very simple program that search for the "install" file on [https://golang.org/dl/](https://golang.org/dl/) based on your O.S. Makes the download, and verifies it's checksum.
 
 ## Dependencies and Acknowlegments
 
@@ -17,6 +17,8 @@ go get github.com/google/wire/cmd/wire
 ```
 
 and ensuring that `$GOPATH/bin` is added to your `$PATH`.
+
+I'm also using some code extracted from [https://golangcode.com/download-a-file-with-progress/](https://golangcode.com/download-a-file-with-progress/)
 
 ## Running it
 
