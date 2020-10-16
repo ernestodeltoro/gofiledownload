@@ -1,7 +1,7 @@
 ## goFileDownload
 Just code for downloading Go compiler files with Golang
 
-[![Go Report Card](https://goreportcard.com/report/github.com/ernestodeltoro/gofiledownload)](https://goreportcard.com/badge/github.com/ernestodeltoro/gofiledownload)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ernestodeltoro/gofiledownload)](https://goreportcard.com/report/github.com/ernestodeltoro/gofiledownload)
 
 
 Very simple program that search for the "install" file on [https://golang.org/dl/](https://golang.org/dl/) based on your O.S. Makes the download, and verifies it's checksum.
