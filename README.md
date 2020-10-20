@@ -13,7 +13,7 @@ I'm using google/wire: [https://github.com/google/wire](https://github.com/googl
 Probably you will need to install wire in order to build this code:
 
 ```shell
-go get github.com/google/wire/cmd/wire
+$ go get github.com/google/wire/cmd/wire
 ```
 
 and ensuring that `$GOPATH/bin` is added to your `$PATH`.
