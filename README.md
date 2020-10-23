@@ -1,5 +1,5 @@
 ## goFileDownload
-Just code for downloading Go compiler files with Golang
+Code to download Golang's installation files from the web page 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ernestodeltoro/goFileDownload)](https://goreportcard.com/report/github.com/ernestodeltoro/gofiledownload)
 
