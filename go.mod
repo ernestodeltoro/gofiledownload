@@ -1,4 +1,4 @@
-module github.com/ernestodeltoro/goFileDownload
+module github.com/ernestodeltoro/gofiledownload
 
 go 1.15
 

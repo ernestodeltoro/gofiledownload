@@ -11,8 +11,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ernestodeltoro/goFileDownload/progresswritter"
-	ws "github.com/ernestodeltoro/goFileDownload/webscraper"
+	"github.com/ernestodeltoro/gofiledownload/progresswritter"
+	ws "github.com/ernestodeltoro/gofiledownload/webscraper"
 )
 
 const (
