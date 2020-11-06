@@ -37,7 +37,7 @@ The installation file will download to the same folder.
 
 Thank you for considering to help out with the source code! I am grateful for even the smallest of fixes or improvements! I'm lacking tests for this application, so if you want you can start there.
 
-If you'd like to contribute to goFileDownload, follow these steps:
+If you'd like to contribute to ([gofiledownload](https://github.com/ernestodeltoro/gofiledownload)), follow these steps:
 
 1. Fork repository ([github help](https://help.github.com/en/articles/fork-a-repo))
 2. Create a branch
