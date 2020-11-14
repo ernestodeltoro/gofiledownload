@@ -56,16 +56,13 @@ func main() {
 
 	fmt.Printf("Done in %s...\n", elapsed)
 
-	shaOK, err := VerifyFileSHA256(fd)
+	err = VerifyFileSHA256(fd)
 	if err != nil {
 		fmt.Printf(err.Error())
+		return
 	}
 
-	if !shaOK {
-		fmt.Println("SHA256 values don't match")
-	} else {
-		fmt.Println("SHA256 value verified, ok")
-	}
+	fmt.Println("SHA256 value verified, ok")
 
 }
 
@@ -120,26 +117,26 @@ func DownloadFile(fd FileData) error {
 
 // VerifyFileSHA256 Compares the expected SHA256 with the actual value
 // extracted from the file and returns true if they match
-func VerifyFileSHA256(fd FileData) (bool, error) {
+func VerifyFileSHA256(fd FileData) error {
 	f, err := os.Open(fd.FilePath)
 	if err != nil {
-		return false, err
+		return err
 	}
 	defer f.Close()
 
 	h := sha256.New()
 	_, err = io.Copy(h, f)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	strSHA := fmt.Sprintf("%x", h.Sum(nil))
 
 	if strSHA != fd.FileSHA256 {
-		return false, nil
+		return errors.New("SHA values don't match")
 	}
 
-	return true, nil
+	return nil
 }
 
 // DownloadData will return the data needed to download and save the file
