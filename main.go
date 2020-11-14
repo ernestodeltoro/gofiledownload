@@ -40,7 +40,7 @@ func main() {
 	fd, err := InitializeFileData()
 	if err != nil {
 		fmt.Printf("failed to create event: %s\n", err.Error())
-		os.Exit(2)
+		return
 	}
 
 	fmt.Printf("To download:\n%s\n", fd.FileURL)
@@ -50,6 +50,7 @@ func main() {
 	err = DownloadFile(fd)
 	if err != nil {
 		fmt.Printf(err.Error())
+		return
 	}
 
 	elapsed := time.Since(start)
