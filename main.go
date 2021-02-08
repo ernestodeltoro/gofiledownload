@@ -91,7 +91,6 @@ func DownloadFile(fd FileData) error {
 		return errors.New("Bad status: " + resp.Status)
 	}
 
-	//pw := progresswritter.NewConcurrent(uint64(resp.ContentLength), 1000)
 	pw := progresswritter.NewNonBloking(uint64(resp.ContentLength), 1000)
 
 	// Write the body to file
