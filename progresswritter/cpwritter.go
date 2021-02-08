@@ -38,7 +38,8 @@ func NewConcurrent(fullSize uint64, sleepTime time.Duration) *ConcurrentProgress
 
 func (pw *ConcurrentProgressWriter) Write(p []byte) (int, error) {
 	n := len(p)
-	pw.currentWritten += uint64(n)
+	atomic.AddUint64(&pw.currentWritten, uint64(n))
+	// pw.currentWritten += uint64(n)
 	if atomic.CompareAndSwapUint64(&pw.currentWritten, pw.fullSize, pw.fullSize) {
 		// print for the last time
 		pw.updateProgress()
@@ -66,5 +67,5 @@ func (pw *ConcurrentProgressWriter) updateProgress() {
 
 	// Return again and print current status of download
 	// We use the humanize package to print the bytes in a meaningful way (e.g. 10 MB)
-	fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(pw.currentWritten), pw.fullSizeStr)
+	fmt.Printf("\rDownloading... %s complete of %s", humanize.Bytes(atomic.LoadUint64(&pw.currentWritten)), pw.fullSizeStr)
 }
