@@ -17,7 +17,8 @@ import (
 
 const (
 	sourceFile int = iota
-	appleFile
+	appleFilex86
+	appleFileARM
 	linuxFile
 	windowsFile
 )
@@ -145,7 +146,7 @@ func DownloadData(osARCH OsArch) (fd FileData, err error) {
 
 	homePage := "https://golang.org"
 	seedURL := homePage + "/dl/"
-	const numberOfHighlightedItemsToRetrieve = 4
+	const numberOfHighlightedItemsToRetrieve = 5
 
 	// Get the data
 	resp, err := http.Get(seedURL)
@@ -193,7 +194,7 @@ func GetOSFileIndex() OsArch {
 	case "linux":
 		osARCH = linuxFile
 	case "darwin":
-		osARCH = appleFile
+		osARCH = appleFilex86
 	default:
 		osARCH = sourceFile
 	}
