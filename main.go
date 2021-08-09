@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -50,7 +51,7 @@ func main() {
 
 	err = DownloadFile(fd)
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -60,12 +61,18 @@ func main() {
 
 	err = VerifyFileSHA256(fd)
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Println(err.Error())
 		return
 	}
 
 	fmt.Println("SHA256 value verified, ok")
+	waitForEnterPress()
+}
 
+func waitForEnterPress() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Press enter to exit: ")
+	reader.ReadString('\n')
 }
 
 // DownloadFile will download a url to a local file. It's efficient because it will
