@@ -42,6 +42,7 @@ func main() {
 	fd, err := InitializeFileData()
 	if err != nil {
 		fmt.Printf("failed to create event: %s\n", err.Error())
+		waitForEnterPress()
 		return
 	}
 
@@ -52,6 +53,7 @@ func main() {
 	err = DownloadFile(fd)
 	if err != nil {
 		fmt.Println(err.Error())
+		waitForEnterPress()
 		return
 	}
 
@@ -62,6 +64,7 @@ func main() {
 	err = VerifyFileSHA256(fd)
 	if err != nil {
 		fmt.Println(err.Error())
+		waitForEnterPress()
 		return
 	}
 
