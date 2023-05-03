@@ -154,7 +154,7 @@ func VerifyFileSHA256(fd FileData) error {
 // DownloadData will return the data needed to download and save the file
 func DownloadData(osARCH OsArch) (fd FileData, err error) {
 
-	homePage := "https://golang.org"
+	homePage := "https://go.dev"
 	seedURL := homePage + "/dl/"
 	const numberOfHighlightedItemsToRetrieve = 5
 
@@ -191,7 +191,7 @@ func makeProperHREF(href string, proto string) string {
 		return href
 	}
 
-	newHref := ws.AddProto(href, "https://golang.org")
+	newHref := ws.AddProto(href, "https://go.dev")
 	return newHref
 }
 

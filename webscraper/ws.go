@@ -133,10 +133,7 @@ func isTT(token *html.Token) bool {
 // with the value "highlight"
 func isClassHighlight(token *html.Token) bool {
 	class, _ := getClass(token)
-	if class == "highlight" {
-		return true
-	}
-	return false
+	return strings.Contains(class, "highlight")
 }
 
 // Helper function to pull the class attribute from a Token
