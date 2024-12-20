@@ -176,7 +176,7 @@ func DownloadData(osARCH OsArch) (fd FileData, err error) {
 	}
 
 	fd.FilePath = links[osARCH].FileName()
-	fd.FileURL = makeProperHREF(links[osARCH].Href(), homePage)
+	fd.FileURL = makeProperHREF(links[osARCH].Href())
 	fd.FileSHA256 = links[osARCH].Sha256()
 	err = nil
 
@@ -184,7 +184,7 @@ func DownloadData(osARCH OsArch) (fd FileData, err error) {
 }
 
 // makeProperHREF construct the proper HREF based on the home web page
-func makeProperHREF(href string, proto string) string {
+func makeProperHREF(href string) string {
 	// Make sure the url begins in http**
 	hasProto := ws.HasHTTP(href)
 	if hasProto {
