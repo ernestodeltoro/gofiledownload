@@ -1,6 +1,8 @@
 module github.com/ernestodeltoro/gofiledownload
 
-go 1.15
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/dustin/go-humanize v1.0.1
